@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MainScreen from "../../MainScreen";
 import { Link } from "react-router-dom";
 import { Accordion, Badge, Button, Card } from "react-bootstrap";
-import notes from "../../../data/notes";
+import axios from "axios";
 
 function MyNotes() {
+  const [notes, setNotes] = useState([]);
+
   const deleteHandler = (id) => {
     if (window.confirm("Are you sure about this?")) {
     }
   };
+
+  const fetchNotes = async () => {
+    const { data } = await axios.get("http://localhost:5000/notes");
+    setNotes(data);
+  };
+
+  console.log(notes);
+
+  useEffect(() => {
+    fetchNotes();
+  }, []);
 
   return (
     <MainScreen title="Welcome back Leonardo Rodrigues">
@@ -19,7 +32,7 @@ function MyNotes() {
       </Link>
       {notes.map((note) => {
         return (
-          <Accordion defaultActiveKey={["0"]}>
+          <Accordion key={note._id} defaultActiveKey={["0"]}>
             <Accordion.Item eventKey="0">
               <Card style={{ margin: 10 }}>
                 <Card.Header style={{ display: "flex" }}>
