@@ -1,31 +1,35 @@
-const { User: UserModel, User } = require("../models/usersModel");
+import asyncHandler from "express-async-handler";
+import User from "../models/usersModel.js";
 
-const userController = {
-  registerUser: async (req, res) => {
-    try {
-      const user = {
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-        picture: req.body.picture,
-      };
-      const response = await UserModel.create(user);
-      res.status(201).json({ response, message: "User succefully created" });
-    } catch (error) {
-      throw new Error(`Post request error: ${error}`);
-    }
-  },
-  getAllUsers: async (req, res) => {
-    try {
-      const user = await UserModel.find();
-      res.status(200).json({ user: user });
-    } catch (error) {
-      throw new Error(`GET request error: ${error}`);
-    }
-  },
-  getUser: async (req, res) => {},
-  updateUser: async (req, res) => {},
-  deleteUser: async (req, res) => {},
-};
+const registerUser = asyncHandler(async (req, res) => {
+  const { name, email, password, pic } = req.body;
 
-module.exports = userController;
+  const userExists = await User.findOne({ email });
+
+  if (userExists) {
+    res.status(404);
+    throw new Error("User already exists");
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    pic,
+  });
+
+  if (user) {
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      pic: user.pic,
+    });
+  } else {
+    res.status(400);
+    throw new Error("User not found");
+  }
+});
+
+export { registerUser };

@@ -1,19 +1,24 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const notes = require("./data/notes");
-const cors = require("cors");
-const connectDb = require("./config/db");
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import databaseConnection from "./config/db.js";
+import userRouter from "./routes/userRoutes.js";
+import {
+  errorHandler,
+  notFound,
+} from "./middlewares/errorMiddlewareErrorHandler.js";
 
 //Server Configs
 const app = express();
 app.use(express.json());
 app.use(cors("Access-Control-Allow-Origin", "*"));
 dotenv.config();
-connectDb();
+databaseConnection();
 
 //Routes()
-const routes = require("./routes/router");
-app.use("/note", routes);
+app.use("/users", userRouter);
+// app.use(notFound);
+// app.use(errorHandler);
 
 //Server Port
 const PORT = process.env.PORT || 5000;
@@ -22,10 +27,7 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// app.get("/notes", (req, res) => {
-//   res.json(notes);
-// });
-
+//Webserver
 app.listen(PORT, () => {
   try {
     console.log(

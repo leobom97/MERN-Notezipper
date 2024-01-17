@@ -1,8 +1,7 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
-const { Schema } = mongoose;
-
-const userSchema = new Schema(
+const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
@@ -19,22 +18,30 @@ const userSchema = new Schema(
     },
     isAdmin: {
       type: Boolean,
-      required: true,
+      required: false,
       default: false,
     },
-    picture: {
+    pic: {
       type: String,
-      required: false,
+      required: true,
       default:
         "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
+
+// will encrypt password everytime its saved
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    next();
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
 
 const User = mongoose.model("User", userSchema);
 
-module.exports = {
-  User,
-  userSchema,
-};
+export default User;
