@@ -3,10 +3,16 @@ import dotenv from "dotenv";
 import cors from "cors";
 import databaseConnection from "./config/db.js";
 import userRouter from "./routes/userRoutes.js";
+import bodyParser from "body-parser";
 
 //Server Configs
 const app = express();
 app.use(express.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: false,
+  })
+);
 app.use(cors("Access-Control-Allow-Origin", "*"));
 dotenv.config();
 databaseConnection();
