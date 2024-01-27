@@ -6,13 +6,15 @@ import "./RegisterScreen.css";
 import ErrorMessage from "../../ErrorMessage";
 import axios from "axios";
 import Loading from "../../Loading";
+import SuccessfullMessage from "../../SuccefulMessage";
 
 function RegisterScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSucessMessage] = useState(null);
   const [picMessage, setPicMessage] = useState(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -21,9 +23,11 @@ function RegisterScreen() {
     event.preventDefault();
 
     if (password !== confirmPassword) {
-      setMessage("Senhas não são iguais");
+      setErrorMessage(
+        "Os campos de senha não estão idênticos! Por favor informe senhas iguais em ambos os campos"
+      );
     } else {
-      setMessage(null);
+      setErrorMessage(null);
       try {
         const config = {
           headers: {
@@ -38,6 +42,7 @@ function RegisterScreen() {
         );
         setLoading(false);
         localStorage.setItem("userInfo", JSON.stringify(data));
+        setSucessMessage("Usuário cadastrado com sucesso!!!");
       } catch (error) {
         setError(error.response.data.message);
       }
@@ -47,7 +52,13 @@ function RegisterScreen() {
   return (
     <MainScreen title="Cadastro">
       <div className="loginContainer">
-        {message && <ErrorMessage message={message}></ErrorMessage>}
+        {errorMessage ? (
+          <ErrorMessage message={errorMessage}></ErrorMessage>
+        ) : (
+          successMessage && (
+            <SuccessfullMessage message={successMessage}></SuccessfullMessage>
+          )
+        )}
         {loading && <Loading />}
         <Form onSubmit={submitHandler}>
           <Form.Group controlId="name">
